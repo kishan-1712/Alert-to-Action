@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>From Alert to Action | Guidance Content Analyzer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="container">
+      <h1>From Alert to Action</h1>
+      <p class="subtitle">Qualitative Content-Analysis & Checklist Scoring Tool for Unknown Bluetooth Tracker Guidance</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Step 1: Source Selection & Coding Form -->
+    <section class="card">
+      <h2>1. Source Collection & Document Coding</h2>
+      <p class="hint">Add official, public guidance pages. Non-qualifying sources are automatically excluded per Algorithm 1.</p>
+      
+      <form id="sourceForm">
+        <div class="grid-3">
+          <div class="form-group">
+            <label for="provider">Provider Name *</label>
+            <input type="text" id="provider" placeholder="e.g., Apple, Google, Tile, Samsung" required />
+          </div>
+          <div class="form-group">
+            <label for="pageTitle">Guidance Page Title *</label>
+            <input type="text" id="pageTitle" placeholder="e.g., What to do if you get an alert..." required />
+          </div>
+          <div class="form-group">
+            <label for="accessDate">Access Date *</label>
+            <input type="date" id="accessDate" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="sourceUrl">Source URL *</label>
+          <input type="url" id="sourceUrl" placeholder="https://support.apple.com/..." required />
+        </div>
+
+        <!-- Inclusion Filter Criteria -->
+        <div class="filter-box">
+          <span class="filter-title">Inclusion Criteria Check (All 3 required):</span>
+          <label class="checkbox-label">
+            <input type="checkbox" id="isOfficial" checked /> Official Provider Source
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="isPublic" checked /> Publicly Accessible
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="isAlertRelated" checked /> Addresses Unknown-Tracker Alerts
+          </label>
+        </div>
+
+        <!-- Checklist C1 - C4 Scoring -->
+        <div id="checklistSection" class="checklist-grid">
+          <div class="checklist-item">
+            <label for="c1Score"><strong>C1:</strong> Interpret the Alert</label>
+            <select id="c1Score">
+              <option value="0">0 - Absent</option>
+              <option value="1">1 - Mentioned (Partial/Vague)</option>
+              <option value="2">2 - Clear & Actionable</option>
+            </select>
+            <textarea id="c1Notes" rows="2" placeholder="Supporting text or location in document..."></textarea>
+          </div>
+
+          <div class="checklist-item">
+            <label for="c2Score"><strong>C2:</strong> Locate & Disable Tracker</label>
+            <select id="c2Score">
+              <option value="0">0 - Absent</option>
+              <option value="1">1 - Mentioned (Partial/Vague)</option>
+              <option value="2">2 - Clear & Actionable</option>
+            </select>
+            <textarea id="c2Notes" rows="2" placeholder="Supporting text or location in document..."></textarea>
+          </div>
+
+          <div class="checklist-item">
+            <label for="c3Score"><strong>C3:</strong> Retain Useful Information</label>
+            <select id="c3Score">
+              <option value="0">0 - Absent</option>
+              <option value="1">1 - Mentioned (Partial/Vague)</option>
+              <option value="2">2 - Clear & Actionable</option>
+            </select>
+            <textarea id="c3Notes" rows="2" placeholder="Supporting text or location in document..."></textarea>
+          </div>
+
+          <div class="checklist-item">
+            <label for="c4Score"><strong>C4:</strong> Seek Further Assistance</label>
+            <select id="c4Score">
+              <option value="0">0 - Absent</option>
+              <option value="1">1 - Mentioned (Partial/Vague)</option>
+              <option value="2">2 - Clear & Actionable</option>
+            </select>
+            <textarea id="c4Notes" rows="2" placeholder="Supporting text or location in document..."></textarea>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Save & Evaluate Source</button>
+          <button type="button" id="loadSampleBtn" class="btn btn-secondary">Load Sample Dataset</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Step 2: Cross-Provider Comparison Matrix -->
+    <section class="card">
+      <div class="section-header">
+        <div>
+          <h2>2. Provider Coverage & Gap Matrix</h2>
+          <p class="hint">Aggregates highest item score per provider. Coverage = Sum / 8. Items &lt; 2 are flagged as potential gaps.</p>
+        </div>
+        <div class="export-buttons">
+          <button id="exportCsvBtn" class="btn btn-outline">Export CSV</button>
+          <button id="exportJsonBtn" class="btn btn-outline">Export JSON</button>
+          <button id="clearAllBtn" class="btn btn-danger">Reset Data</button>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table id="comparisonTable">
+          <thead>
+            <tr>
+              <th>Provider</th>
+              <th>Included Pages</th>
+              <th>C1 (Interpret)</th>
+              <th>C2 (Locate/Disable)</th>
+              <th>C3 (Retain Info)</th>
+              <th>C4 (Seek Help)</th>
+              <th>Total (Max 8)</th>
+              <th>Coverage Score</th>
+              <th>Identified Gaps (&lt; 2)</th>
+            </tr>
+          </thead>
+          <tbody id="comparisonBody">
+            <tr><td colspan="9" class="empty-state">No sources coded yet. Add a source above or load sample data.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Step 3: Logged Sources Repository (Included & Excluded) -->
+    <section class="card">
+      <h2>3. Logged Guidance Documents</h2>
+      <div class="table-wrapper">
+        <table id="sourcesTable">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Provider</th>
+              <th>Page Title & URL</th>
+              <th>Access Date</th>
+              <th>Scores (C1-C4)</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="sourcesBody">
+            <tr><td colspan="6" class="empty-state">No documents logged yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
